@@ -1,0 +1,54 @@
+{# 继承基础模板 #}
+{% extends 'base.html' %}
+
+{# 设置页面标题为车辆品牌和名称 #}
+{% block title %}{{ car.brand }} {{ car.name }}{% endblock %}
+
+{# 页面主要内容 #}
+{% block content %}
+{# 使用Bootstrap栅格系统创建两列布局 #}
+<div class="row">
+    {# 左侧图片列，占据一半宽度 #}
+    <div class="col-md-6">
+        {# 响应式图片显示，带圆角效果 #}
+        <img src="{{ car.image.url }}" class="img-fluid rounded" alt="{{ car.name }}">
+    </div>
+    {# 右侧信息列，占据一半宽度 #}
+    <div class="col-md-6">
+        {# 车辆标题 #}
+        <h1>{{ car.brand }} {{ car.name }}</h1>
+        {# 车辆详细信息区域 #}
+        <div class="mb-4">
+            {# 显示车辆基本信息 #}
+            <p><strong>型号：</strong>{{ car.model }}</p>
+            <p><strong>年份：</strong>{{ car.year }}</p>
+            <p><strong>价格：</strong>￥{{ car.price }}</p>
+            <p><strong>描述：</strong></p>
+            {# 使用linebreaks过滤器处理换行 #}
+            <p>{{ car.description|linebreaks }}</p>
+        </div>
+        
+        {# 收藏功能区域 #}
+        {% if user.is_authenticated %}
+            {# 已登录用户显示收藏表单 #}
+            <form action="{% url 'toggle_favorite' car.id %}" method="post">
+                {% csrf_token %}
+                {# 根据收藏状态显示不同样式的按钮 #}
+                <button type="submit" class="btn {% if is_favorite %}btn-danger{% else %}btn-outline-primary{% endif %}">
+                    {% if is_favorite %}
+                        取消收藏
+                    {% else %}
+                        添加收藏
+                    {% endif %}
+                </button>
+            </form>
+        {% else %}
+            {# 未登录用户显示登录链接 #}
+            <a href="{% url 'login' %}" class="btn btn-primary">登录后收藏</a>
+        {% endif %}
+        
+        {# 返回列表按钮 #}
+        <a href="{% url 'car_list' %}" class="btn btn-secondary mt-3">返回列表</a>
+    </div>
+</div>
+{% endblock %} 

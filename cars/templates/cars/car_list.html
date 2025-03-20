@@ -1,0 +1,184 @@
+{% extends 'base.html' %}
+
+{# 定义页面标题 #}
+{% block title %}车辆列表{% endblock %}
+
+{% block content %}
+<style>
+    /* 页面整体背景样式 */
+    body {
+        /* 创建135度角的渐变背景，从浅蓝色渐变到浅红色 */
+        background: linear-gradient(135deg,rgb(163, 189, 253) 0%,rgb(255, 161, 161) 100%);
+        /* 确保背景至少占满整个视窗高度 */
+        min-height: 100vh;
+    }
+
+    /* 页面标题样式 */
+    .page-header {
+        text-align: center;          /* 文字居中 */
+        margin-bottom: 2rem;         /* 下方间距 */
+        padding: 1rem;               /* 内边距 */
+        color: #2c3e50;             /* 深蓝灰色文字 */
+        font-weight: 600;            /* 字体加粗 */
+        position: relative;          /* 相对定位，用于装饰线 */
+    }
+
+    /* 页面标题下方的装饰线 */
+    .page-header:after {
+        content: '';                 /* 创建装饰线 */
+        display: block;              
+        width: 60px;                /* 线的宽度 */
+        height: 3px;                /* 线的高度 */
+        background: #3498db;        /* 蓝色背景 */
+        margin: 10px auto;          /* 居中显示 */
+        border-radius: 3px;         /* 圆角效果 */
+    }
+
+    /* 内容容器样式 */
+    .container {
+        padding: 2rem 1rem;         /* 容器内边距 */
+    }
+
+    /* 车辆卡片样式 */
+    .car-card {
+        transition: all 0.3s ease;   /* 所有属性变化时的过渡效果 */
+        cursor: pointer;             /* 鼠标变为手型 */
+        position: relative;          
+        top: 0;
+        background: rgba(255, 255, 255, 0.23);  /* 半透明白色背景 */
+        border: none;                /* 移除边框 */
+        backdrop-filter: blur(10px); /* 背景模糊效果 */
+    }
+    
+    /* 卡片悬浮效果 */
+    .car-card:hover {
+        transform: translateY(-10px);  /* 向上移动10像素 */
+        box-shadow: 0 15px 30px rgba(0,0,0,0.1);  /* 添加阴影 */
+    }
+
+    /* 卡片图片样式 */
+    .car-card .card-img-top {
+        transition: all 0.3s ease;    /* 图片变化过渡效果 */
+        height: 200px;               /* 固定图片高度 */
+        object-fit: cover;           /* 图片填充方式 */
+    }
+
+    /* 图片悬浮效果 */
+    .car-card:hover .card-img-top {
+        transform: scale(1.05);      /* 图片放大5% */
+    }
+
+    /* 图片容器样式 */
+    .car-image-wrapper {
+        overflow: hidden;            /* 隐藏溢出部分 */
+        border-radius: 10px 10px 0 0;  /* 上方圆角 */
+        background: #f8f9fa;         /* 背景色 */
+    }
+
+    /* 价格样式 */
+    .car-price {
+        color: rgb(255, 25, 0);      /* 红色价格 */
+        font-weight: bold;           /* 加粗 */
+        font-size: 1.2em;            /* 字体放大 */
+        text-shadow: 1px 1px 1px rgba(0,0,0,0.1);  /* 文字阴影 */
+    }
+
+    /* 品牌样式 */
+    .car-brand {
+        color: rgb(0, 0, 0);         /* 黑色文字 */
+        font-size: 0.9em;            /* 字体稍小 */
+        margin-bottom: 5px;          /* 下方间距 */
+        font-weight: 500;            /* 字体加粗 */
+    }
+
+    /* 年份标签样式 */
+    .car-year {
+        position: absolute;          /* 绝对定位 */
+        top: 10px;                  /* 距顶部10px */
+        right: 10px;                /* 距右侧10px */
+        background: rgba(0,0,0,0.6);  /* 半透明黑色背景 */
+        color: white;               /* 白色文字 */
+        padding: 5px 15px;          /* 内边距 */
+        border-radius: 20px;        /* 圆角效果 */
+        font-size: 0.8em;           /* 字体稍小 */
+        backdrop-filter: blur(5px);  /* 背景模糊效果 */
+    }
+
+    /* 查看详情按钮样式 */
+    .view-details-btn {
+        transition: all 0.3s ease;   /* 过渡效果 */
+        width: 100%;                /* 宽度100% */
+        border-radius: 25px;        /* 圆角 */
+        padding: 10px;              /* 内边距 */
+        font-weight: 500;           /* 字体加粗 */
+        border: none;               /* 无边框 */
+        background: linear-gradient(145deg, #007bff, #0056b3);  /* 渐变背景 */
+    }
+
+    /* 按钮悬浮效果 */
+    .car-card:hover .view-details-btn {
+        background: linear-gradient(145deg, #0056b3, #004085);  /* 更深的渐变背景 */
+        transform: scale(1.05);      /* 按钮放大 */
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);  /* 添加阴影 */
+    }
+
+    /* 卡片标题样式 */
+    .card-title {
+        font-size: 1.25rem;         /* 字体大小 */
+        font-weight: 600;           /* 字体加粗 */
+        margin-bottom: 1rem;        /* 下方间距 */
+        color: #2c3e50;            /* 深蓝灰色 */
+    }
+
+    /* 卡片文本样式 */
+    .card-text {
+        color: #555;               /* 灰色文字 */
+        line-height: 1.6;          /* 行高 */
+    }
+
+    /* 响应式布局样式 */
+    @media (max-width: 768px) {    /* 在小屏幕设备上 */
+        .container {
+            padding: 1rem 0.5rem;   /* 减小内边距 */
+        }
+        
+        .col-md-4 {
+            padding: 0 0.5rem;      /* 减小列间距 */
+        }
+    }
+</style>
+
+{# 页面标题区域 #}
+<div class="page-header">
+    <h1>精选车辆</h1>
+</div>
+
+{# 车辆列表区域 #}
+<div class="row">
+    {% for car in cars %}  {# 遍历所有车辆 #}
+    <div class="col-md-4 mb-4">  {# 每行显示3个卡片，底部间距4个单位 #}
+        <div class="card car-card h-100">  {# 卡片容器，高度100% #}
+            <div class="car-image-wrapper">  {# 图片容器 #}
+                <img src="{{ car.image.url }}" class="card-img-top car-image" alt="{{ car.name }}">
+                <div class="car-year">{{ car.year }}年</div>  {# 年份标签 #}
+            </div>
+            <div class="card-body">  {# 卡片内容区域 #}
+                <div class="car-brand">{{ car.brand }}</div>  {# 品牌名称 #}
+                <h5 class="card-title">{{ car.name }}</h5>    {# 车型名称 #}
+                <p class="card-text">  {# 车辆信息 #}
+                    <strong>型号：</strong>{{ car.model }}<br>
+                    <strong class="car-price">￥{{ car.price|floatformat:0 }}</strong>  {# 价格，去除小数点 #}
+                </p>
+                <a href="{% url 'car_detail' car.id %}" class="btn btn-primary view-details-btn">查看详情</a>  {# 详情按钮 #}
+            </div>
+        </div>
+    </div>
+    {% empty %}  {# 如果没有车辆数据 #}
+    <div class="col-12">
+        <div class="alert alert-info text-center">  {# 显示提示信息 #}
+            <i class="bi bi-info-circle me-2"></i>暂无车辆信息
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %} 
