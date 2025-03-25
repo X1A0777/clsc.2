@@ -1,0 +1,165 @@
+{# 声明文档类型为HTML5 #}
+<!DOCTYPE html>
+{# 设置网页语言为中文 #}
+<html lang="zh">
+<head>
+    {# 设置字符编码为UTF-8 #}
+    <meta charset="UTF-8">
+    {# 设置移动设备视口 #}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {# 页面标题块，可被子模板重写 #}
+    <title>{% block title %}车辆收藏{% endblock %}</title>
+    {# 引入Bootstrap 5 CSS框架 #}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    {# 引入Bootstrap图标库 #}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        /* 全局样式设置 */
+        body {
+            background-color: rgb(255, 255, 255);  /* 设置白色背景 */
+            padding-top: 60px;                     /* 为固定导航栏留出空间 */
+        }
+        /* 导航栏样式 */
+        .navbar {
+            background-color:rgb(255, 255, 255);   /* 导航栏白色背景 */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* 添加柔和阴影 */
+        }
+        /* 卡片组件样式 */
+        .card {
+            margin-bottom: 20px;                   /* 卡片底部间距 */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* 卡片阴影效果 */
+        }
+        /* 车辆图片样式 */
+        .car-image {
+            height: 200px;                         /* 固定图片高度 */
+            object-fit: cover;                     /* 图片填充方式 */
+        }
+        /* 下拉菜单样式 */
+        .dropdown-menu {
+            border: none;                          /* 移除边框 */
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); /* 添加阴影效果 */
+        }
+        /* 模态框样式 */
+        .modal-content {
+            border: none;                          /* 移除边框 */
+            border-radius: 10px;                   /* 圆角效果 */
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1); /* 添加阴影 */
+        }
+    </style>
+</head>
+<body>
+    {# 固定顶部导航栏 #}
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top">
+        <div class="container">
+            {# 网站Logo和主页链接 #}
+            <a class="navbar-brand" href="{% url 'car_list' %}">
+                <i class="bi bi-car-front"></i> 车辆收藏
+            </a>
+            {# 响应式菜单按钮 #}
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            {# 导航菜单内容 #}
+            <div class="collapse navbar-collapse" id="navbarNav">
+                {# 左侧导航项目 #}
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'car_list' %}">首页</a>
+                    </li>
+                    {# 管理员专属菜单项 #}
+                    {% if user.is_authenticated and user.is_staff %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'admin:index' %}">
+                            <i class="bi bi-gear"></i> 管理后台
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+                {# 右侧用户菜单 #}
+                <ul class="navbar-nav">
+                    {% if user.is_authenticated %}
+                        {# 已登录用户下拉菜单 #}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-person-circle"></i> 
+                                {{ user.username }}
+                                {% if user.is_staff %}
+                                    <span class="badge bg-primary">管理员</span>
+                                {% endif %}
+                            </a>
+                            {# 用户下拉菜单选项 #}
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'my_favorites' %}">
+                                        <i class="bi bi-heart"></i> 我的收藏
+                                    </a>
+                                </li>
+                                {% if user.is_staff %}
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'admin:index' %}">
+                                        <i class="bi bi-gear"></i> 管理后台
+                                    </a>
+                                </li>
+                                {% endif %}
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#logoutModal">
+                                        <i class="bi bi-box-arrow-right"></i> 退出
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    {% else %}
+                        {# 未登录用户选项 #}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'login' %}">登录</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'register' %}">注册</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    {# 主要内容区域 #}
+    <div class="container mt-4">
+        {# 消息提示区域 #}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+        
+        {# 子模板内容块 #}
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    {# 退出确认模态框 #}
+    <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="logoutModalLabel">确认退出</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>您确定要退出登录吗？</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <a href="{% url 'logout' %}" class="btn btn-primary">确认退出</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# 引入Bootstrap 5 JavaScript库 #}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 

@@ -1,0 +1,42 @@
+<div class="card h-100">
+    {% if car.image %}
+        <img src="{{ car.image.url }}" class="card-img-top" alt="{{ car.model }}">
+    {% else %}
+        <img src="/static/img/car-placeholder.jpg" class="card-img-top" alt="默认车辆图片">
+    {% endif %}
+    <div class="card-body">
+        <h5 class="card-title">
+            <a href="{% url 'car_detail' car.id %}">{{ car.model }}</a>
+        </h5>
+        <p class="card-text">
+            <strong>价格:</strong> ¥{{ car.price }}
+        </p>
+        <p class="card-text">
+            <strong>年份:</strong> {{ car.year }}
+        </p>
+        {% if car.brand %}
+            <p class="card-text">
+                <strong>品牌:</strong> {{ car.brand }}
+            </p>
+        {% endif %}
+    </div>
+    <div class="card-footer">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <a href="{% url 'car_detail' car.id %}" class="btn btn-sm btn-primary">查看详情</a>
+            </div>
+            {% if user.is_authenticated %}
+                <form action="{% url 'toggle_favorite' car.id %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                        {% if car in user.profile.favorite_cars.all %}
+                            <i class="bi bi-heart-fill"></i> 已收藏
+                        {% else %}
+                            <i class="bi bi-heart"></i> 收藏
+                        {% endif %}
+                    </button>
+                </form>
+            {% endif %}
+        </div>
+    </div>
+</div> 

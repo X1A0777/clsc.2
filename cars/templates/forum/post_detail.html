@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="mb-4">
+        <a href="{% url 'post_list' %}" class="btn btn-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> 返回论坛
+        </a>
+    </div>
+    
+    <!-- 帖子内容 -->
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h3 class="mb-0">{{ post.title }}</h3>
+            <small class="text-muted">
+                发布于 {{ post.created_at|date:"Y-m-d H:i" }}
+                {% if post.created_at != post.updated_at %}
+                    (更新于 {{ post.updated_at|date:"Y-m-d H:i" }})
+                {% endif %}
+            </small>
+        </div>
+        <div class="card-body">
+            <div class="mb-3">
+                <p class="card-text">{{ post.content|linebreaks }}</p>
+            </div>
+            <div class="d-flex justify-content-between">
+                <span class="text-muted">作者: {{ post.author.username }}</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 评论列表 -->
+    <h4>评论 ({{ comments.count }})</h4>
+    {% for comment in comments %}
+        <div class="card mb-2">
+            <div class="card-body">
+                <p class="card-text">{{ comment.content }}</p>
+                <div class="d-flex justify-content-between">
+                    <small class="text-muted">{{ comment.author.username }}</small>
+                    <small class="text-muted">{{ comment.created_at|date:"Y-m-d H:i" }}</small>
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <div class="alert alert-info">暂无评论</div>
+    {% endfor %}
+    
+    <!-- 添加评论表单 -->
+    <div class="card mt-4">
+        <div class="card-header">
+            <h5 class="mb-0">发表评论</h5>
+        </div>
+        <div class="card-body">
+            <form method="post" action="{% url 'post_detail' post.id %}">
+                {% csrf_token %}
+                <div class="mb-3">
+                    {{ form.content.label_tag }}
+                    {{ form.content }}
+                    {% if form.content.errors %}
+                        <div class="text-danger">
+                            {% for error in form.content.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                <button type="submit" class="btn btn-primary">提交评论</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %} 

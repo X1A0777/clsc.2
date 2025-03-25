@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}我的收藏{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">我的收藏</h1>
+<div class="row">
+    {% for favorite in favorites %}
+    <div class="col-md-4">
+        <div class="card">
+            <img src="{{ favorite.car.image.url }}" class="card-img-top car-image" alt="{{ favorite.car.name }}">
+            <div class="card-body">
+                <h5 class="card-title">{{ favorite.car.brand }} {{ favorite.car.name }}</h5>
+                <p class="card-text">
+                    <strong>型号：</strong>{{ favorite.car.model }}<br>
+                    <strong>年份：</strong>{{ favorite.car.year }}<br>
+                    <strong>价格：</strong>￥{{ favorite.car.price }}
+                </p>
+                <div class="d-flex justify-content-between">
+                    <a href="{% url 'car_detail' favorite.car.id %}" class="btn btn-primary">查看详情</a>
+                    <form action="{% url 'toggle_favorite' favorite.car.id %}" method="post" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">取消收藏</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <p class="text-center">您还没有收藏任何车辆</p>
+        <p class="text-center">
+            <a href="{% url 'car_list' %}" class="btn btn-primary">浏览车辆</a>
+        </p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %} 

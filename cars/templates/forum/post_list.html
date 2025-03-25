@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>论坛</h2>
+        <a href="{% url 'create_post' %}" class="btn btn-primary">发布新帖</a>
+    </div>
+    
+    <div class="row">
+        {% for post in posts %}
+            <div class="col-12 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <a href="{% url 'post_detail' post.id %}">{{ post.title }}</a>
+                        </h5>
+                        <p class="card-text">{{ post.content|truncatewords:30 }}</p>
+                        <div class="text-muted">
+                            <small>
+                                作者: {{ post.author.username }} | 
+                                发布时间: {{ post.created_at|date:"Y-m-d H:i" }} |
+                                评论: {{ post.comments.count }}
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12">
+                <p>暂无帖子</p>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %} 

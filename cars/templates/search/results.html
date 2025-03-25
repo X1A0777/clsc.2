@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h2>搜索结果: "{{ query }}"</h2>
+    
+    <!-- 车辆搜索结果 -->
+    <h3>车辆 ({{ cars.count }})</h3>
+    <div class="row">
+        {% for car in cars %}
+            <div class="col-md-4 mb-4">
+                <!-- 车辆卡片 -->
+                {% include 'cars/car_card.html' with car=car %}
+            </div>
+        {% empty %}
+            <div class="col-12">
+                <p>未找到相关车辆</p>
+            </div>
+        {% endfor %}
+    </div>
+    
+    <!-- 帖子搜索结果 -->
+    <h3>论坛帖子 ({{ posts.count }})</h3>
+    <div class="row">
+        {% for post in posts %}
+            <div class="col-12 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <a href="{% url 'post_detail' post.id %}">{{ post.title }}</a>
+                        </h5>
+                        <p class="card-text">{{ post.content|truncatewords:30 }}</p>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12">
+                <p>未找到相关帖子</p>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %} 
